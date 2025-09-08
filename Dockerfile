@@ -22,8 +22,11 @@ RUN uv sync --frozen
 # Copy application code
 COPY . .
 
-# Create data directory
-RUN mkdir -p data
+# Create data and model directories
+RUN mkdir -p data models results logs
+
+# Create volume mount points
+VOLUME ["/app/data"]
 
 # Expose port
 EXPOSE 8501
