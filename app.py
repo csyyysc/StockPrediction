@@ -10,6 +10,7 @@ from components import (
     render_app_header,
     render_sidebar,
     render_overview_tab,
+    render_top_stocks_tab,
     render_training_tab,
     render_results_tab,
     render_analysis_tab
@@ -29,19 +30,22 @@ def app():
     config = render_sidebar()
 
     # Main content area with tabs
-    tab1, tab2, tab3, tab4 = st.tabs(
-        ["📊 Overview", "🤖 Training", "📈 Results", "🔍 Analysis"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(
+        ["📊 Overview", "🔥 Top Stocks", "🤖 Training", "📈 Results", "🔍 Analysis"])
 
     with tab1:
         render_overview_tab(config['symbol'])
 
     with tab2:
-        render_training_tab(config)
+        render_top_stocks_tab()
 
     with tab3:
-        render_results_tab()
+        render_training_tab(config)
 
     with tab4:
+        render_results_tab()
+
+    with tab5:
         render_analysis_tab(config)
 
 

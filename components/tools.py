@@ -10,11 +10,13 @@ import yfinance as yf
 from typing import Dict
 
 
-@st.cache_data
+@st.cache_data(ttl=3600)
 def get_popular_stocks():
-    """Get list of popular stocks."""
+    """Get list of popular stocks with top 10 for current month."""
+    import yfinance as yf
+    from datetime import datetime
 
-    return {
+    static_stocks = {
         'Technology': ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NVDA', 'NFLX'],
         'Finance': ['JPM', 'BAC', 'WFC', 'GS', 'MS', 'C', 'BRK-B'],
         'Healthcare': ['JNJ', 'PFE', 'UNH', 'MRK', 'ABBV', 'TMO', 'OSCR'],
@@ -22,6 +24,175 @@ def get_popular_stocks():
         'Energy': ['XOM', 'CVX', 'COP', 'SLB'],
         'ETFs': ['SPY', 'QQQ', 'IWM', 'VTI', 'VOO']
     }
+
+    try:
+        current_month = datetime.now().strftime("%Y-%m")
+
+        major_stocks = [
+            'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NVDA', 'NFLX',
+            'JPM', 'BAC', 'WFC', 'GS', 'MS', 'C', 'BRK-B',
+            'JNJ', 'PFE', 'UNH', 'MRK', 'ABBV', 'TMO',
+            'KO', 'PEP', 'WMT', 'HD', 'MCD', 'NKE',
+            'XOM', 'CVX', 'COP', 'SLB',
+            'SPY', 'QQQ', 'IWM', 'VTI', 'VOO'
+        ]
+
+        stock_data = {}
+        for symbol in major_stocks:
+            try:
+                ticker = yf.Ticker(symbol)
+                hist = ticker.history(period="1mo")
+                if not hist.empty:
+                    # Calculate metrics for popularity ranking
+                    volume_avg = hist['Volume'].mean()
+                    price_change = (
+                        hist['Close'].iloc[-1] - hist['Close'].iloc[0]) / hist['Close'].iloc[0]
+                    volatility = hist['Close'].std() / hist['Close'].mean()
+
+                    # Popularity score (volume + price change + volatility)
+                    popularity_score = (volume_avg / 1e6) + \
+                        abs(price_change * 100) + (volatility * 100)
+
+                    stock_data[symbol] = {
+                        'score': popularity_score,
+                        'volume': volume_avg,
+                        'price_change': price_change,
+                        'volatility': volatility
+                    }
+            except Exception:
+                continue
+
+        top_stocks = sorted(stock_data.items(),
+                            key=lambda x: x[1]['score'], reverse=True)[:10]
+        top_symbols = [symbol for symbol, _ in top_stocks]
+
+        dynamic_stocks = {
+            f'🔥 Top 10 This Month ({current_month})': top_symbols,
+            'Technology': static_stocks['Technology'],
+            'Finance': static_stocks['Finance'],
+            'Healthcare': static_stocks['Healthcare'],
+            'Consumer': static_stocks['Consumer'],
+            'Energy': static_stocks['Energy'],
+            'ETFs': static_stocks['ETFs']
+        }
+
+        return dynamic_stocks
+
+    except Exception as e:
+        st.warning(
+            f"Could not fetch dynamic stock data: {str(e)}. Using static list.")
+        return static_stocks
+
+
+@st.cache_data(ttl=1800)
+def get_top_stocks_analysis():
+    """Get detailed analysis of top performing stocks for the month."""
+    import pandas as pd
+    import yfinance as yf
+    from datetime import datetime
+
+    try:
+        current_month = datetime.now().strftime("%Y-%m")
+
+        popular_stocks = get_popular_stocks()
+        top_symbols = popular_stocks.get(
+            f'🔥 Top 10 This Month ({current_month})', [])
+
+        if not top_symbols:
+            return None
+
+        analysis_data = []
+        for symbol in top_symbols:
+            try:
+                ticker = yf.Ticker(symbol)
+                hist = ticker.history(period="1mo")
+                info = ticker.info
+
+                if not hist.empty:
+                    start_price = hist['Close'].iloc[0]
+                    end_price = hist['Close'].iloc[-1]
+                    price_change = (end_price - start_price) / start_price
+                    volume_avg = hist['Volume'].mean()
+                    volatility = hist['Close'].std() / hist['Close'].mean()
+
+                    analysis_data.append({
+                        'symbol': symbol,
+                        'name': info.get('longName', symbol),
+                        'sector': info.get('sector', 'N/A'),
+                        'price_change_pct': price_change * 100,
+                        'current_price': end_price,
+                        'avg_volume': volume_avg,
+                        'volatility': volatility * 100,
+                        'market_cap': info.get('marketCap', 0)
+                    })
+            except Exception:
+                continue
+
+        return pd.DataFrame(analysis_data)
+
+    except Exception as e:
+        st.warning(f"Could not fetch detailed stock analysis: {str(e)}")
+        return None
+
+
+@st.cache_data(ttl=1800)
+def get_category_stocks_analysis(stock_symbols, analysis_type="Popularity Score"):
+    """Get detailed analysis for stocks in a specific category."""
+    import pandas as pd
+    import yfinance as yf
+
+    try:
+        analysis_data = []
+
+        for symbol in stock_symbols:
+            try:
+                ticker = yf.Ticker(symbol)
+                hist = ticker.history(period="1mo")
+                info = ticker.info
+
+                if not hist.empty:
+                    start_price = hist['Close'].iloc[0]
+                    end_price = hist['Close'].iloc[-1]
+                    price_change = (end_price - start_price) / start_price
+                    volume_avg = hist['Volume'].mean()
+                    volatility = hist['Close'].std() / hist['Close'].mean()
+
+                    popularity_score = (volume_avg / 1e6) + \
+                        abs(price_change * 100) + (volatility * 100)
+
+                    analysis_data.append({
+                        'symbol': symbol,
+                        'name': info.get('longName', symbol),
+                        'sector': info.get('sector', 'N/A'),
+                        'price_change_pct': price_change * 100,
+                        'current_price': end_price,
+                        'avg_volume': volume_avg,
+                        'volatility': volatility * 100,
+                        'market_cap': info.get('marketCap', 0),
+                        'popularity_score': popularity_score
+                    })
+            except Exception:
+                continue
+
+        if not analysis_data:
+            return None
+
+        df = pd.DataFrame(analysis_data)
+
+        if analysis_type == "Popularity Score":
+            df = df.sort_values('popularity_score', ascending=False)
+        elif analysis_type == "Price Change":
+            df = df.sort_values('price_change_pct', ascending=False)
+        elif analysis_type == "Volume":
+            df = df.sort_values('avg_volume', ascending=False)
+        elif analysis_type == "Volatility":
+            df = df.sort_values('volatility', ascending=False)
+
+        return df.head(10)
+
+    except Exception as e:
+        st.error(f"Error analyzing stocks: {str(e)}")
+        return None
 
 
 @st.cache_data

@@ -11,6 +11,8 @@ def render_overview_tab(symbol: str):
     """Render the stock market overview tab."""
 
     st.header("Stock Market Overview")
+    st.markdown(
+        "Welcome to the Stock Prediction System! Select a stock symbol from the sidebar to view detailed market analysis.")
 
     if symbol:
         try:

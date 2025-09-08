@@ -1,18 +1,22 @@
 [server]
 # Server configuration
 port = 8501
-address = "localhost"
+address = "0.0.0.0"
 headless = true
 enableXsrfProtection = false
 maxUploadSize = 200
 
 [browser]
 # Browser settings
-serverAddress = "localhost"
+serverAddress = "0.0.0.0"
 serverPort = 8501
 
 [theme]
-# Theme configuration
+# Dark theme configuration
+primaryColor = "#00D4AA"
+backgroundColor = "#0E1117"
+secondaryBackgroundColor = "#262730"
+textColor = "#FAFAFA"
 font = "sans serif"
 
 [client]

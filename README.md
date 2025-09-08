@@ -438,6 +438,113 @@ CUDA out of memory / RAM issues
 - Use smaller window sizes
 - Train on CPU for small models
 
+## 🚀 Deployment
+
+### 🌐 Render.com Deployment
+
+The application is configured for easy deployment on Render.com with proper port binding and environment configuration.
+
+#### Prerequisites
+1. **GitHub Repository**: Push your code to GitHub
+2. **Render Account**: Sign up at [render.com](https://render.com)
+
+#### Deployment Steps
+
+**1. Connect Repository**
+- Go to Render Dashboard
+- Click "New +" → "Web Service"
+- Connect your GitHub repository
+
+**2. Configure Service**
+```
+Name: stock-prediction-app
+Environment: Python 3.11
+Region: Choose closest to your users
+Branch: main (or your default branch)
+```
+
+**3. Build & Deploy Settings**
+```
+Build Command: pip install uv && uv sync
+Start Command: uv run streamlit run app.py --server.address 0.0.0.0 --server.port $PORT
+```
+
+**4. Environment Variables**
+```
+STREAMLIT_SERVER_ADDRESS=0.0.0.0
+STREAMLIT_SERVER_HEADLESS=true
+STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+```
+
+**5. Deploy**
+- Click "Create Web Service"
+- Wait for build to complete (5-10 minutes)
+- Your app will be available at `https://your-app-name.onrender.com`
+
+#### 🐳 Docker Deployment
+
+For containerized deployment using the provided Dockerfile:
+
+```bash
+# Build the image
+docker build -t stock-prediction-app .
+
+# Run the container
+docker run -p 8501:8501 stock-prediction-app
+```
+
+#### 🔧 Local Production Testing
+
+Test your deployment configuration locally:
+
+```bash
+# Run deployment preparation script
+uv run python deploy.py
+
+# Test with production settings
+export STREAMLIT_SERVER_ADDRESS=0.0.0.0
+export STREAMLIT_SERVER_HEADLESS=true
+uv run streamlit run app.py --server.address 0.0.0.0 --server.port 8501
+```
+
+#### 📋 Deployment Checklist
+
+- [ ] All required files present (`app.py`, `pyproject.toml`, `uv.lock`, etc.)
+- [ ] Streamlit config updated for production (`address = "0.0.0.0"`)
+- [ ] Environment variables configured
+- [ ] Build and start commands set correctly
+- [ ] Application tested locally with production settings
+
+#### 🚨 Common Deployment Issues
+
+**Port Binding Error**
+```
+No open ports detected on 0.0.0.0
+```
+- **Solution**: Ensure `STREAMLIT_SERVER_ADDRESS=0.0.0.0` in environment variables
+- **Check**: `.streamlit/config.toml` has `address = "0.0.0.0"`
+
+**Build Failures**
+```
+ModuleNotFoundError or dependency issues
+```
+- **Solution**: Use `pip install uv && uv sync` as build command
+- **Check**: `pyproject.toml` and `uv.lock` are committed
+
+**Memory Issues**
+```
+Application crashes or times out
+```
+- **Solution**: Upgrade to paid Render plan for more resources
+- **Alternative**: Optimize code or reduce data processing
+
+#### 🔄 Continuous Deployment
+
+The application supports automatic deployments:
+- Push to `main` branch triggers automatic deployment
+- Use `render.yaml` for infrastructure as code
+- Monitor deployment logs in Render dashboard
+
 ## 🤝 Contributing
 
 Feel free to contribute by:
@@ -450,6 +557,7 @@ Feel free to contribute by:
 - **Extending the modular components** (new tabs, sidebar features, etc.)
 - **Improving the component architecture** (better separation of concerns)
 - **Adding new utility functions** to the tools module
+- **Improving deployment configurations** and documentation
 
 ## 📄 License
 

@@ -13,6 +13,7 @@ It can be run in different modes:
 import sys
 
 from agent import list_agents
+from utils.parameters import AppMode
 from utils import (
     parse_arguments,
     create_training_parameters,
@@ -22,7 +23,6 @@ from utils import (
     run_evaluation,
     run_web_interface
 )
-from utils.parameters import AppMode
 
 
 def main() -> None:
@@ -47,7 +47,7 @@ def main() -> None:
 
         else:
             # This should never happen due to argparse choices, but provides type safety
-            raise ValueError(f"Invalid mode: {mode}")
+            sys.exit(1)
 
     except KeyboardInterrupt:
         print("\n⏹️  Operation cancelled by user")
