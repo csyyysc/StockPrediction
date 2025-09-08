@@ -1,0 +1,30 @@
+[server]
+# Server configuration
+port = 8501
+address = "localhost"
+headless = true
+enableXsrfProtection = false
+maxUploadSize = 200
+
+[browser]
+# Browser settings
+serverAddress = "localhost"
+serverPort = 8501
+
+[theme]
+# Theme configuration
+font = "sans serif"
+
+[client]
+# Client-side settings
+showErrorDetails = true
+#toolbarMode = "minimal"
+
+[runner]
+# Performance settings
+magicEnabled = true
+
+[logger]
+# Logging configuration
+level = "info"
+messageFormat = "%(asctime)s.%(msecs)03d %(levelname)s: %(message)s"
