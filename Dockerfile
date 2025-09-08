@@ -41,4 +41,4 @@ ENV STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
 # Run the application
-CMD ["uv", "run", "streamlit", "run", "app.py", "--server.address", "0.0.0.0", "--server.port", "8501"]
+CMD ["uv", "run", "streamlit", "run", "app.py", "--server.address", "0.0.0.0", "--server.port", "8502"]

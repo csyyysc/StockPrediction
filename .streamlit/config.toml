@@ -22,7 +22,7 @@ font = "sans serif"
 [client]
 # Client-side settings
 showErrorDetails = true
-#toolbarMode = "minimal"
+toolbarMode = "minimal"
 
 [runner]
 # Performance settings
