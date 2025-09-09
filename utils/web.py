@@ -20,13 +20,13 @@ def run_web_interface(params: WebParameters) -> None:
     print("🚀 Starting Streamlit web interface...")
 
     # Check if running in production (Render, Heroku, etc.)
-    port = os.environ.get('PORT', '8501')
-    address = os.environ.get('STREAMLIT_SERVER_ADDRESS', 'localhost')
+    port = os.environ.get('PORT', '8502')
+    address = os.environ.get('STREAMLIT_SERVER_ADDRESS', '0.0.0.0')
 
     if address == '0.0.0.0':
         print(f"🌐 Production mode: Server will be accessible on port {port}")
     else:
-        print("📱 Development mode: Open your browser to http://localhost:8501")
+        print("📱 Development mode: Open your browser to http://localhost:8502")
 
     # Launch Streamlit with proper configuration
     subprocess.run([
