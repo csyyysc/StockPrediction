@@ -58,6 +58,7 @@ class StockTradingEnv:
 
         except Exception as e:
             print(f"Error loading data for {self.symbol}: {e}")
+
             # Fallback to AAPL if symbol fails
             if self.symbol != "AAPL":
                 print("Falling back to AAPL...")
@@ -142,8 +143,32 @@ class StockTradingEnv:
         print(
             f"Training samples: {len(self.train_features)}, Test samples: {len(self.test_features)}")
 
+    def reset(self, mode: str = 'train') -> np.ndarray:
+        """Reset the environment."""
+
+        if mode == 'train':
+            self.current_features = self.train_features
+            self.current_prices = self.train_prices
+        else:
+            self.current_features = self.test_features
+            self.current_prices = self.test_prices
+
+        self.current_step = 0
+        self.initial_cash = 10000.0
+        self.cash = self.initial_cash
+        self.position = 0  # Number of shares held
+        self.portfolio_value = self.initial_cash
+        self.total_reward = 0.0
+
+        # Trading history
+        self.trades = []
+        self.portfolio_values = [self.initial_cash]
+
+        return self.get_state()
+
     def get_state(self) -> np.ndarray:
         """Get current state (features for the window)."""
+
         if self.current_step < self.window_size:
             # Pad with zeros if we don't have enough history
             state = np.zeros(
@@ -168,32 +193,16 @@ class StockTradingEnv:
 
         return full_state
 
-    def reset(self, mode: str = 'train') -> np.ndarray:
-        """Reset the environment."""
-        if mode == 'train':
-            self.current_features = self.train_features
-            self.current_prices = self.train_prices
-        else:
-            self.current_features = self.test_features
-            self.current_prices = self.test_prices
-
-        self.current_step = 0
-        self.initial_cash = 10000.0
-        self.cash = self.initial_cash
-        self.position = 0  # Number of shares held
-        self.portfolio_value = self.initial_cash
-        self.total_reward = 0.0
-
-        # Trading history
-        self.trades = []
-        self.portfolio_values = [self.initial_cash]
-
-        return self.get_state()
-
     def step(self, action: int) -> Tuple[np.ndarray, float, bool, Dict]:
         """Execute one step in the environment."""
+
         if self.current_step >= len(self.current_prices) - 1:
             return self.get_state(), 0.0, True, {}
+
+        # Validate action
+        if action not in [0, 1, 2]:
+            raise ValueError(
+                f"Invalid action: {action}. Valid actions are 0 (Hold), 1 (Buy), 2 (Sell)")
 
         # Get current and next prices
         current_price = self.current_prices[self.current_step]
@@ -203,7 +212,10 @@ class StockTradingEnv:
         reward = 0.0
         trade_executed = False
 
-        if action == 1:  # Buy
+        if action == 0:  # Hold
+            # No action taken
+            pass
+        elif action == 1:  # Buy
             shares_to_buy = self.cash // current_price
             if shares_to_buy > 0:
                 cost = shares_to_buy * current_price
@@ -242,10 +254,10 @@ class StockTradingEnv:
 
         # Additional info
         info = {
-            'portfolio_value': self.portfolio_value,
             'cash': self.cash,
             'position': self.position,
             'current_price': next_price,
+            'portfolio_value': self.portfolio_value,
             'trade_executed': trade_executed,
             'total_return': (self.portfolio_value - self.initial_cash) / self.initial_cash
         }
@@ -254,11 +266,13 @@ class StockTradingEnv:
 
     def get_state_size(self) -> int:
         """Get the size of the state space."""
+
         # Window size * number of features + portfolio state (3 values)
         return self.window_size * self.current_features.shape[1] + 3
 
     def set_mode(self, mode: str):
         """Set environment mode (train/test)."""
+
         if mode == 'train':
             self.current_features = self.train_features
             self.current_prices = self.train_prices
@@ -268,6 +282,7 @@ class StockTradingEnv:
 
     def get_portfolio_performance(self) -> Dict:
         """Get portfolio performance metrics."""
+
         returns = np.array(self.portfolio_values)
         daily_returns = np.diff(returns) / returns[:-1]
 
@@ -291,6 +306,7 @@ class StockTradingEnv:
 
     def _calculate_max_drawdown(self) -> float:
         """Calculate maximum drawdown."""
+
         values = np.array(self.portfolio_values)
         peak = np.maximum.accumulate(values)
         drawdown = (values - peak) / peak

@@ -77,6 +77,7 @@ class StockTrainer:
 
     def train_episode(self) -> Dict:
         """Train for one episode."""
+
         state = self.env.reset(mode='train')
         episode_reward = 0.0
         steps = 0

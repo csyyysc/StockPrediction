@@ -101,3 +101,14 @@ plots/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# pytest
+htmlcov/
+.coverage
+coverage.xml
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
