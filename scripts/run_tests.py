@@ -25,9 +25,12 @@ def run_tests():
                        "pytest", "pytest-cov", "coverage"])
 
     # Run tests with coverage
+    repo_root = Path(__file__).resolve().parent.parent
+    tests_dir = (repo_root / "tests").as_posix()
+
     test_args = [
         "pytest",
-        "tests/",
+        tests_dir,
         "-v",
         "--cov=envs",
         "--cov=trainers",
@@ -42,7 +45,7 @@ def run_tests():
     ]
 
     print("📊 Running tests with coverage...")
-    result = subprocess.run(test_args, cwd=Path(__file__).parent)
+    result = subprocess.run(test_args, cwd=repo_root)
 
     if result.returncode == 0:
         print("\n✅ All tests passed!")
@@ -56,11 +59,12 @@ def run_tests():
 def run_specific_tests(module=None):
     """Run tests for specific modules."""
 
+    repo_root = Path(__file__).resolve().parent.parent
     if module:
-        test_path = f"../tests/{module}/"
+        test_path = (repo_root / "tests" / module).as_posix()
         print(f"🎯 Running tests for {module} module...")
     else:
-        test_path = "../tests/"
+        test_path = (repo_root / "tests").as_posix()
         print("🎯 Running all tests...")
 
     test_args = [
@@ -76,7 +80,7 @@ def run_specific_tests(module=None):
         "--tb=short"
     ]
 
-    result = subprocess.run(test_args, cwd=Path(__file__).parent)
+    result = subprocess.run(test_args, cwd=repo_root)
     return result.returncode == 0
 
 

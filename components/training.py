@@ -47,7 +47,9 @@ def render_training_tab(config: dict):
 
     st.info(config_text)
 
-    if st.button("🚀 Start Training", type="primary"):
+    if st.button("🚀 Start Training", type="primary", key="start_training_btn"):
+        # Ensure we keep focus on the Training tab on reruns
+        st.session_state["stay_on_training"] = True
         progress_bar = st.progress(0)
         status_text = st.empty()
 

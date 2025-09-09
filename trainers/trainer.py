@@ -240,7 +240,6 @@ class StockTrainer:
                         self.results_dir, 'best_model.pth')
                     self.agent.save_model(model_path)
 
-                    # Save evaluation results
                     eval_path = os.path.join(
                         self.results_dir, 'best_evaluation.json')
                     with open(eval_path, 'w') as f:
@@ -258,15 +257,12 @@ class StockTrainer:
                     self.results_dir, f'model_episode_{episode + 1}.pth')
                 self.agent.save_model(model_path)
 
-        # Final evaluation
         final_eval = self.evaluate_episode()
 
-        # Save training metrics
         metrics_path = os.path.join(self.results_dir, 'training_metrics.json')
         with open(metrics_path, 'w') as f:
             json.dump(self.training_metrics, f, indent=2)
 
-        # Save final model
         final_model_path = os.path.join(self.results_dir, 'final_model.pth')
         self.agent.save_model(final_model_path)
 

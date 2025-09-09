@@ -29,9 +29,10 @@ def app():
     # Render sidebar and get configuration
     config = render_sidebar()
 
-    # Main content area with tabs
+    # Main content area with tabs (key preserves active tab across reruns)
     tab1, tab2, tab3, tab4, tab5 = st.tabs(
-        ["📊 Overview", "🔥 Top Stocks", "🤖 Training", "📈 Results", "🔍 Analysis"])
+        ["📊 Overview", "🔥 Top Stocks", "🤖 Training", "📈 Results", "🔍 Analysis"]
+    )
 
     with tab1:
         render_overview_tab(config['symbol'])
