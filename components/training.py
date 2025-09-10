@@ -47,9 +47,16 @@ def render_training_tab(config: dict):
 
     st.info(config_text)
 
-    if st.button("🚀 Start Training", type="primary", key="start_training_btn"):
+    is_training = st.session_state.get("is_training", False)
+
+    if is_training:
+        # Show a disabled Stop button while training is in progress
+        st.button("⏹ Stop Training", disabled=True, key="stop_training_btn")
+
+    if not is_training and st.button("🚀 Start Training", type="primary", key="start_training_btn"):
         # Ensure we keep focus on the Training tab on reruns
         st.session_state["stay_on_training"] = True
+        st.session_state["is_training"] = True
         progress_bar = st.progress(0)
         status_text = st.empty()
 
@@ -130,3 +137,5 @@ def render_training_tab(config: dict):
         except Exception as e:
             st.error(f"Training failed: {str(e)}")
             st.exception(e)
+        finally:
+            st.session_state["is_training"] = False

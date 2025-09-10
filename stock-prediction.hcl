@@ -29,7 +29,7 @@ job "projects" {
       driver = "docker"
       config {
         image = "ghcr.io/csyyysc/stock-prediction"
-        ports = ["www"]
+        ports = ["stock-prediction"]
       }
 
       resources {
@@ -39,7 +39,7 @@ job "projects" {
 
       service {
         name     = "stock-prediction"
-        port     = "www"
+        port     = "stock-prediction"
         provider = "nomad"
         tags     = ["stock-prediction"]
 

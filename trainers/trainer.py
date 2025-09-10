@@ -71,8 +71,10 @@ class StockTrainer:
             'excess_returns': []
         }
 
-        # Create results directory with agent type
-        self.results_dir = f"results_{agent_type}_{symbol}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        self.results_dir = os.path.join(
+            "data", f"results_{agent_type}_{symbol}_{timestamp}"
+        )
         os.makedirs(self.results_dir, exist_ok=True)
 
     def train_episode(self) -> Dict:
