@@ -19,7 +19,7 @@ job "projects" {
   group "apps" {
     count = 1
     network {
-      port "www" {
+      port "stock-prediction" {
         static = 8502
         to = 8502 # Internal Port
      }
