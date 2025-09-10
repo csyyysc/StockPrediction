@@ -114,7 +114,43 @@ uv sync
 pip install -e .
 ```
 
-### 2. Launch Web Interface (Recommended)
+### 2. Makefile Shortcuts
+
+For convenience, a `Makefile` is provided with common tasks:
+
+```bash
+# List available targets
+make help
+
+# Install dependencies
+make setup
+
+# Launch Streamlit web app (http://localhost:8501)
+make web
+
+# Run the generic entry (main.py) with a mode
+make run MODE=web      # default
+make run MODE=train
+make run MODE=eval
+
+# Train a model with defaults or overrides
+make train SYMBOL=AAPL AGENT=vac EPISODES=500
+make train SYMBOL=NVDA AGENT=a3c EPISODES=1000 WINDOW=60 WORKERS=-1 TRAIN_PERIOD=3y LR=0.0005
+
+# Evaluate a saved model (specify MODEL path)
+make eval MODEL=data/results_vac_AAPL_20240115_143022/best_model.pth SYMBOL=AAPL AGENT=vac
+
+# Run tests with coverage (see pytest.ini)
+make test
+
+# Docker workflows
+make docker-build
+make docker-up        # uses docker-compose.yml
+make docker-up-dev    # uses docker-compose.dev.yml
+make docker-down
+```
+
+### 3. Launch Web Interface (Recommended)
 
 ```bash
 # Using uv (recommended)
@@ -140,7 +176,7 @@ This opens an interactive Streamlit dashboard at `http://localhost:8501` with a 
 - **Monitor Progress**: Real-time training visualization
 - **Analyze Results**: Interactive charts and performance metrics
 
-### 3. Command Line Training
+### 4. Command Line Training
 
 ```bash
 # Using uv (recommended)
@@ -160,7 +196,7 @@ uv run python main.py --mode train --symbol NVDA --agent a3c --workers 4 --train
 uv run python main.py --mode train --symbol SPY --agent a3c --workers -1 --episodes 1000
 ```
 
-### 4. Evaluate Trained Models
+### 5. Evaluate Trained Models
 
 ```bash
 # Evaluate a VAC model
